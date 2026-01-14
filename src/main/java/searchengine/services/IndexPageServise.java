@@ -38,11 +38,11 @@ public class IndexPageServise {
 
     private static final int MAX_CONTENT_LENGTH = 500000; // ~500KB
 
-    public IndexingResponse indexPage(String url) throws MalformedURLException, InvalidUrlException {
+    public IndexingResponse indexPage(String url) throws RuntimeException {
         return indexPage(url, false);
     }
 
-    public IndexingResponse indexPage(String url, boolean isIndexingOnePage) throws InvalidUrlException, MalformedURLException {
+    public IndexingResponse indexPage(String url, boolean isIndexingOnePage) throws RuntimeException {
 
         checkURLFormat(url);
         // проверим URL, что входит в список индексируемых сайтов

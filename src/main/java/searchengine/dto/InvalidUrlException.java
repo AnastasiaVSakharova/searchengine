@@ -1,6 +1,6 @@
 package searchengine.dto;
 
-public class InvalidUrlException extends Exception{
+public class InvalidUrlException extends RuntimeException{
     public InvalidUrlException(String message) {
         super(message);
     }
