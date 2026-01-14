@@ -30,18 +30,18 @@ public class ApiController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<StatisticsResponse> statistics() {
-        return ResponseEntity.ok(statisticsService.getStatistics());
+    public StatisticsResponse statistics() {
+        return statisticsService.getStatistics();
     }
 
     @GetMapping("/startIndexing")
-    public ResponseEntity<IndexingResponse> startIndexing() {
-        return ResponseEntity.ok(siteIndexingServise.startIndexing());
+    public IndexingResponse startIndexing() {
+        return siteIndexingServise.startIndexing();
     }
 
     @GetMapping("/stopIndexing")
-    public ResponseEntity<IndexingResponse> stopIndexing() {
-        return ResponseEntity.ok(siteIndexingServise.stopIndexing());
+    public IndexingResponse stopIndexing() {
+        return siteIndexingServise.stopIndexing();
     }
 
     @PostMapping("/indexPage")
@@ -55,10 +55,10 @@ public class ApiController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<SearchResponse> indexPage(@RequestParam("query") String query,
+    public SearchResponse indexPage(@RequestParam("query") String query,
                                                     @RequestParam(value = "site", required = false) String site,
                                                     @RequestParam(value = "offset", defaultValue = "0") int offset,
                                                     @RequestParam(value = "limit", defaultValue = "20") int limit) {
-            return ResponseEntity.ok(searchService.search(query, site, offset, limit));
+            return searchService.search(query, site, offset, limit);
     }
 }

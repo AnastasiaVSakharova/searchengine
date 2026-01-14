@@ -9,7 +9,7 @@ spring:
   jpa:
     hibernate:
       show-sql: true
-      ddl-auto: create
+      ddl-auto: update
 
 indexing-settings:
   sites:
