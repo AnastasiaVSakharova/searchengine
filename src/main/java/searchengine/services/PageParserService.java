@@ -226,15 +226,6 @@ public class PageParserService extends RecursiveAction {
                 !url.contains(".exe");
     }
 
-    private HashSet<String> getLinksFromPageModel(List<Page> pages) {
-        HashSet<String> links = new HashSet<>();
-        for (Page item : pages) {
-            links.add(item.getPath());
-        }
-
-        return links;
-    }
-
     public static Optional<String> getPathFromUrl(String urlString) {
         try {
             URL url = new URL(urlString);
