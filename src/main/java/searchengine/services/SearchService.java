@@ -19,6 +19,7 @@ import searchengine.repositories.LemmaRepository;
 import searchengine.repositories.PageRepository;
 import searchengine.repositories.SiteRepository;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -44,7 +45,11 @@ public class SearchService {
 
 
         for (Site site : sitesSearchList) {
-            dataSearchList.addAll(dataSearchListForSite(query, site));
+            try {
+                dataSearchList.addAll(dataSearchListForSite(query, site));
+            } catch (IOException e) {
+                log.error("Ошибка при поиске леммЖ " + e.getMessage(), e);
+            }
         }
 
         // Коллекция dataSearchList сейчас содержит абсолютную релевантность для каждой страницы
@@ -94,7 +99,7 @@ public class SearchService {
         return siteSearchList;
     }
 
-    private List<Lemma> sortedLemmas(String query, int siteId) {
+    private List<Lemma> sortedLemmas(String query, int siteId) throws IOException {
         HashMap<String, Integer> queryFrequency = TextAnalyzerService.getLemmaFrequency(query);
 
         // Все леммы, по которым ищем
@@ -139,7 +144,7 @@ public class SearchService {
         return pageIdSet;
     }
 
-    private List<DataSearch> dataSearchListForSite(String query, Site site) {
+    private List<DataSearch> dataSearchListForSite(String query, Site site) throws IOException {
         List<DataSearch> dataSearchList = new ArrayList<>();
 
         List<Lemma> sortedLemmaFrequency = sortedLemmas(query, site.getId());

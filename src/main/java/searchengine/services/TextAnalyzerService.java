@@ -60,7 +60,7 @@ public class TextAnalyzerService {
     }
 
     // Считает частоту лем в тексте
-    public static HashMap<String, Integer> getLemmaFrequency(String contex) {
+    public static HashMap<String, Integer> getLemmaFrequency(String contex) throws IOException {
         String text = removeHtmlTags(contex);
         text = keepOnlyRussianLetters(text);
         List<String> words = splitIntoWords(text);
@@ -71,12 +71,10 @@ public class TextAnalyzerService {
             wordFrequencyMap.put(word, wordFrequencyMap.getOrDefault(word, 0) + 1);
         }
 
-        //System.out.println(wordFrequencyMap.size());
-
         HashMap<String, Integer> lemmaFrequency = new HashMap<>();
 
 
-        try {
+
             LuceneMorphology luceneMorph = new RussianLuceneMorphology();
 
             for (Map.Entry<String, Integer> wordFrequency : wordFrequencyMap.entrySet()) {
@@ -95,13 +93,8 @@ public class TextAnalyzerService {
                 }
 
             }
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            System.err.println("Этап анализа текста: " + e.getMessage());
-        }
 
-        //System.out.println(lemmaFrequency.size());
+
         return lemmaFrequency;
     }
 
