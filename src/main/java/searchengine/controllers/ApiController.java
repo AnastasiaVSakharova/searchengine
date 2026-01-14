@@ -1,5 +1,6 @@
 package searchengine.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.IndexingResponse;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class ApiController {
 
@@ -20,14 +22,6 @@ public class ApiController {
     private final SiteIndexingServise siteIndexingServise;
     private final IndexPageServise indexPage;
     private final SearchService searchService;
-
-    public ApiController(StatisticsService statisticsService,
-                         SiteIndexingServise siteIndexingServise, IndexPageServise indexPage, SearchService searchService) {
-        this.statisticsService = statisticsService;
-        this.siteIndexingServise = siteIndexingServise;
-        this.indexPage = indexPage;
-        this.searchService = searchService;
-    }
 
     @GetMapping("/statistics")
     public StatisticsResponse statistics() {

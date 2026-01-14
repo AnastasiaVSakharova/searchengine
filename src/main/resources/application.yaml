@@ -23,7 +23,7 @@ indexing-settings:
       name: Дальний восток
     - url: https://news.mail.ru
       name: News
-    - url: https://pogoda.mail.ru
-      name: Погода mail.ru
+    #- url: https://pogoda.mail.ru
+    #  name: Погода mail.ru
 
 

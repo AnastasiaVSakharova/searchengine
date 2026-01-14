@@ -12,6 +12,7 @@ import searchengine.repositories.SiteRepository;
 import searchengine.config.SitesList;
 import searchengine.model.Site;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +80,10 @@ public class SiteIndexingServise {
             List<Site> siteRepositoryAll = siteRepository.findAll();
             for (Site site : siteRepositoryAll) {
                 if (site.getStatus() == SiteStatus.INDEXING) {
-                    siteRepository.updateErrorDescription("Индексация остановлена пользователем", site.getId());
+                    site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                    site.setLastError("Индексация остановлена пользователем");
+                    site.setStatus(SiteStatus.FAILED);
+                    siteRepository.save(site);
                 }
             }
             return new IndexingResponse(true);

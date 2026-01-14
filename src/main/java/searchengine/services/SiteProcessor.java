@@ -9,7 +9,7 @@ import searchengine.repositories.LemmaRepository;
 import searchengine.repositories.PageRepository;
 import searchengine.repositories.SiteRepository;
 
-import java.util.List;
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
@@ -67,13 +67,18 @@ public class SiteProcessor extends Thread {
             this.forkJoinPool.invoke(parserService);
             if (!PageParserService.isStopRequested()) {
                 // Выполняется после завершения всех потоков
-                siteRepository.updateStatus(SiteStatus.INDEXED, site.getId());
+                site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                site.setStatus(SiteStatus.INDEXED);
+                siteRepository.save(site);
             }
 
         } catch (Exception e) {
             if (!PageParserService.isStopRequested()) {
-                System.out.println("Ошибка на этапе индексации страницы " + url + " Message " + e.getMessage() + e.getStackTrace().toString());
-                siteRepository.updateErrorDescription(e.getMessage(), SiteStatus.FAILED, site.getId());
+                System.out.println("Ошибка на этапе индексации страницы " + url + " Message " + e.getMessage());
+                site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                site.setLastError(e.getMessage());
+                site.setStatus(SiteStatus.FAILED);
+                siteRepository.save(site);
             }
         }
     }
