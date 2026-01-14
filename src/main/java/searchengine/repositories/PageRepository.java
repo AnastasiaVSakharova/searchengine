@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface PageRepository extends JpaRepository<Page, Integer> {
    List<Page> findBySiteId(int id);
-   List<Page> findByPath(String path);
    Page findByPathAndSiteId(String path, int siteId);
    boolean existsByPathAndSiteId(String path, int siteId);
 

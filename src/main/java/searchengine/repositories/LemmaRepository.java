@@ -45,6 +45,5 @@ public interface LemmaRepository extends JpaRepository<Lemma, Integer> {
     Integer findIdByLemmaAndSiteId(@Param("lemma") String lemma,
                                    @Param("siteId") Integer siteId);
 
-    Lemma findByLemma(String lemma);
     Lemma findByLemmaAndSiteId(String lemma, int siteId);
 }

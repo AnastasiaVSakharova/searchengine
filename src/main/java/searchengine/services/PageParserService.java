@@ -13,13 +13,14 @@ import searchengine.dto.IndexingResponse;
 import searchengine.dto.InvalidUrlException;
 import searchengine.dto.model.SiteStatus;
 import searchengine.model.Page;
+import searchengine.model.Site;
 import searchengine.repositories.IndexRepository;
 import searchengine.repositories.LemmaRepository;
 import searchengine.repositories.SiteRepository;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RecursiveAction;
@@ -111,6 +112,9 @@ public class PageParserService extends RecursiveAction {
             page.setCode(response.statusCode());
 
 
+            Site site = siteRepository.findById(siteId).orElse(null);
+            assert site != null;
+
             if (response.statusCode() == 200) {
 
                 Document doc = response.parse();
@@ -125,7 +129,8 @@ public class PageParserService extends RecursiveAction {
 
                 // СОХРАНЯЕМ страницу в репозиторий
                 pageRepository.save(page);
-                siteRepository.updateStatusTime(siteId);
+                site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                siteRepository.save(site);
 
                 // запускаем индексацию страницы
                 System.out.println("Запуск индексации для " + url);
@@ -138,7 +143,10 @@ public class PageParserService extends RecursiveAction {
                 response.statusMessage();
                 page.setContent(response.statusMessage());
                 pageRepository.save(page);
-                siteRepository.updateErrorDescription(response.statusMessage(), SiteStatus.INDEXING, siteId);
+                site.setStatus(SiteStatus.INDEXING);
+                site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                site.setLastError(response.statusMessage());
+                siteRepository.save(site);
             }
 
 

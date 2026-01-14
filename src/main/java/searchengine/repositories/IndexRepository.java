@@ -7,17 +7,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.IndexPages;
-import searchengine.model.Lemma;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.List;
 
 @Repository
 public interface IndexRepository extends JpaRepository<IndexPages, Integer> {
-
-    IndexPages findByLemmaIdAndPageId(Integer lemmaId, Integer pageId);
-
-    List<IndexPages> findByLemmaId(Integer lemmaId);
 
     @Modifying
     @Transactional
