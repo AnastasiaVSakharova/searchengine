@@ -17,14 +17,6 @@ public class GlobalExceptionHandler {
                 .body(new IndexingResponse(false, e.getMessage()));
     }
 
-    @ExceptionHandler(MalformedURLException.class)
-    public ResponseEntity<IndexingResponse> handleMalformedURLException(MalformedURLException e) {
-        log.error("Malformed URL:{}", e.getMessage(), e);
-        return ResponseEntity
-                .badRequest()
-                .body(new IndexingResponse(false, "Некорректный URL: " + e.getMessage()));
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<IndexingResponse> handleAllExceptions(Exception e) {
         log.error("Internal error: {}", e.getMessage(), e);

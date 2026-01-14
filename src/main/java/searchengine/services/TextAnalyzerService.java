@@ -71,8 +71,6 @@ public class TextAnalyzerService {
             wordFrequencyMap.put(word, wordFrequencyMap.getOrDefault(word, 0) + 1);
         }
 
-        //System.out.println(wordFrequencyMap.size());
-
         HashMap<String, Integer> lemmaFrequency = new HashMap<>();
 
 
@@ -101,7 +99,6 @@ public class TextAnalyzerService {
             System.err.println("Этап анализа текста: " + e.getMessage());
         }
 
-        //System.out.println(lemmaFrequency.size());
         return lemmaFrequency;
     }
 

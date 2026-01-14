@@ -38,18 +38,26 @@ public class IndexPageServise {
 
     private static final int MAX_CONTENT_LENGTH = 500000; // ~500KB
 
-    public IndexingResponse indexPage(String url) throws RuntimeException {
+    public IndexingResponse indexPage(String url)  {
         return indexPage(url, false);
     }
 
-    public IndexingResponse indexPage(String url, boolean isIndexingOnePage) throws RuntimeException {
+    public IndexingResponse indexPage(String url, boolean isIndexingOnePage)  {
 
         checkURLFormat(url);
         // проверим URL, что входит в список индексируемых сайтов
-        String rootUrl = checkBaseURL(url);
+        String rootUrl = "";
+
+        try {
+            rootUrl = checkBaseURL(url);
+        } catch (MalformedURLException e) {
+            String error = "Данная страница находится за пределами сайтов, " +
+                    "указанных в конфигурационном файле";
+            return new IndexingResponse(false, error);
+        }
 
         if (rootUrl.isEmpty()) {
-            String error = "Данная страница находится за пределами сайтов,\n" +
+            String error = "Данная страница находится за пределами сайтов, " +
                     "указанных в конфигурационном файле";
             return new IndexingResponse(false, error);
         }
@@ -58,7 +66,13 @@ public class IndexPageServise {
         site = siteRepository.findByUrl(rootUrl);;
         int siteId = site.getId();
 
-        String pagePath = new URL(url).getPath();
+        String pagePath = "";
+        try {
+            pagePath = new URL(url).getPath();
+        } catch (MalformedURLException e) {
+            String error = "Внутренняя ошибка при обработке URL";
+            return new IndexingResponse(false, error);
+        }
         pagePath = normalizePath(pagePath);
         Page page = (pageRepository.findByPathAndSiteId(pagePath, siteId) != null) ? pageRepository.findByPathAndSiteId(pagePath, siteId) : new Page();
 
@@ -133,17 +147,13 @@ public class IndexPageServise {
         String rootURL = extractRootUrl(url);
         List<Site> sites = sitesList.getSites();
 
+        boolean found = false;
+        for (Site site : sites) {
+            if (extractRootUrl(site.getUrl()).equals(rootURL))
+                return rootURL;
+        }
 
-        boolean found = sites.stream()
-                .map(Site::getUrl)
-                .anyMatch(siteUrl -> {
-                    try {
-                        return extractRootUrl(siteUrl).equals(rootURL);
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        return found ? rootURL : "";
+        return "";
     }
 
     private static String extractRootUrl(String urlString) throws MalformedURLException {

@@ -44,16 +44,6 @@ public class ApiController {
         return siteIndexingServise.stopIndexing();
     }
 
-//    @PostMapping("/indexPage")
-//    public ResponseEntity<IndexingResponse> indexPage(@RequestParam("url") String url) {
-//        try {
-//            return ResponseEntity.ok(indexPage.indexPage(url));
-//        } catch (InvalidUrlException | MalformedURLException e) {
-//            IndexingResponse response = new IndexingResponse(false, e.getMessage());
-//            return ResponseEntity.badRequest().body(response);
-//        }
-//    }
-
     @PostMapping("/indexPage")
     public IndexingResponse indexPage(@RequestParam("url") String url) {
         return indexPage.indexPage(url);
