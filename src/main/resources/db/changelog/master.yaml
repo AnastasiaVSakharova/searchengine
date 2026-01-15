@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/site.yaml
+  - include:
+      file: db/changelog/page.yaml
+  - include:
+      file: db/changelog/lemma.yaml
+  - include:
+      file: db/changelog/index.yaml

@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-page.yaml
+  - changeSet:
+      id: create_page_table
+      author: Anastasia
+      changes:
+        - createTable:
+            tableName: site
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: path
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: MEDIUMTEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: site_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_page_site
+                    referencedTableName: site
+                    referencedColumnNames: id
+                    onDelete: CASCADE # Если удаляется site, удаляются и его pages
+
+        - createIndex:
+            tableName: page
+            indexName: idx_page_path
+            columns:
+              - column:
+                  name: path
+
+        - createIndex:
+            tableName: page
+            indexName: idx_page_site_id
+            columns:
+              - column:
+                  name: site_id
+
+        # Уникальность path в рамках одного сайта
+        - addUniqueConstraint:
+            tableName: page
+            columnNames: site_id, path
+            constraintName: uk_page_site_path

@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-index.yaml
+  - changeSet:
+      id: create_index_pages_table
+      author: Anastasia
+      changes:
+        - createTable:
+            tableName: index_pages
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: page_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_index_pages_page
+                    referencedTableName: page
+                    referencedColumnNames: id
+                    onDelete: CASCADE
+              - column:
+                  name: lemma_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_index_pages_lemma
+                    referencedTableName: lemma
+                    referencedColumnNames: id
+                    onDelete: CASCADE
+              - column:
+                  name: my_rank
+                  type: FLOAT
+                  defaultValue: 0.0
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: index_pages
+            indexName: idx_index_pages_page_id
+            columns:
+              - column:
+                  name: page_id
+
+        - createIndex:
+            tableName: index_pages
+            indexName: idx_index_pages_lemma_id
+            columns:
+              - column:
+                  name: lemma_id
+
+        # Уникальная комбинация page_id + lemma_id
+        - addUniqueConstraint:
+            tableName: index_pages
+            columnNames: page_id, lemma_id
+            constraintName: uk_index_pages_page_lemma
+
+        # Составной индекс для частых запросов
+        - createIndex:
+            tableName: index_pages
+            indexName: idx_index_pages_lemma_rank
+            columns:
+              - column:
+                  name: lemma_id
+              - column:
+                  name: my_rank
