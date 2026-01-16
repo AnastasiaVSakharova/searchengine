@@ -5,7 +5,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/master.yaml
-    drop-first: false
+    drop-first: true
 
   datasource:
     username: root
@@ -22,8 +22,8 @@ indexing-settings:
     #  name: Едим дома
     #- url: https://www.svetlovka.ru
     #  name: Библиотека
-    #- url: https://www.ipfran.ru
-    #  name: Институт прикладной физики
+    - url: https://www.ipfran.ru
+      name: Институт прикладной физики
     - url: https://madviz.ru
       name: Дальний восток
     - url: https://news.mail.ru

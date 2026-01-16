@@ -58,13 +58,3 @@ databaseChangeLog:
             tableName: index_pages
             columnNames: page_id, lemma_id
             constraintName: uk_index_pages_page_lemma
-
-        # Составной индекс для частых запросов
-        - createIndex:
-            tableName: index_pages
-            indexName: idx_index_pages_lemma_rank
-            columns:
-              - column:
-                  name: lemma_id
-              - column:
-                  name: my_rank

@@ -5,7 +5,7 @@ databaseChangeLog:
       author: Anastasia
       changes:
         - createTable:
-            tableName: site
+            tableName: page
             columns:
               - column:
                   name: id
