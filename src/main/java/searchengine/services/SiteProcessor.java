@@ -41,16 +41,16 @@ public class SiteProcessor extends Thread {
     public void run() {
         // Удаляем старые данные
         Site site = siteRepository.findByUrl(url);
-        if (!Objects.isNull(site))
-        {
-            System.out.println("Удаление старых данных о странице");
-            Set<Page> pageList = site.getPageList();
-            for (Page page : pageList) {
-                indexRepository.deleteByPageId(page.getId());
-            }
-            lemmaRepository.deleteBySiteId(site.getId());
-            siteRepository.deleteById(site.getId());
-        }
+//        if (!Objects.isNull(site))
+//        {
+//            System.out.println("Удаление старых данных о странице");
+//            Set<Page> pageList = site.getPageList();
+//            for (Page page : pageList) {
+//                indexRepository.deleteByPageId(page.getId());
+//            }
+//            lemmaRepository.deleteBySiteId(site.getId());
+//            siteRepository.deleteById(site.getId());
+//        }
 
         // начинаем индексацию
         site = new Site();
