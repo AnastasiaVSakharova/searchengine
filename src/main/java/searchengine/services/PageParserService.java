@@ -128,14 +128,14 @@ public class PageParserService extends RecursiveAction {
 
 
                 // СОХРАНЯЕМ страницу в репозиторий
-                pageRepository.save(page);
+                Page savedPage = pageRepository.save(page);
                 site.setStatusTime(new Timestamp(System.currentTimeMillis()));
                 siteRepository.save(site);
 
                 // запускаем индексацию страницы
                 System.out.println("Запуск индексации для " + url);
                 IndexPageServise indexPageServise = new IndexPageServise(sitesList, siteRepository, pageRepository, lemmaRepository, indexRepository);
-                IndexingResponse indexingResponse = indexPageServise.indexPage(url);
+                IndexingResponse indexingResponse = indexPageServise.indexPage(savedPage.getId());
                 // Работа с дочерними ссылками
                 processChildLinks(doc);
 
