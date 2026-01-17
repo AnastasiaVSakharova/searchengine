@@ -5,7 +5,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/master.yaml
-    drop-first: true
+    drop-first: false
 
   datasource:
     username: root

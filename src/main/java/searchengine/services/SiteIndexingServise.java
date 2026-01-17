@@ -48,10 +48,14 @@ public class SiteIndexingServise {
 
             for (searchengine.config.Site site : sitesList.getSites()) {
                 System.out.println("Начало индексации сайта: " + site.getName());
-                SiteProcessor siteProcessor = new SiteProcessor(siteRepository, pageRepository, lemmaRepository, indexRepository, sitesList, site.getUrl(), site.getName());
-                runningProcessors.add(siteProcessor);
-
-                siteProcessor.start();
+                Site siteForDel = siteRepository.findByUrl(site.getUrl());
+                if (siteForDel != null) {
+                    siteRepository.delete(siteForDel);
+                }
+//                SiteProcessor siteProcessor = new SiteProcessor(siteRepository, pageRepository, lemmaRepository, indexRepository, sitesList, site.getUrl(), site.getName());
+//                runningProcessors.add(siteProcessor);
+//
+//                siteProcessor.start();
             }
             return new IndexingResponse(true);
         } catch (Exception e) {
