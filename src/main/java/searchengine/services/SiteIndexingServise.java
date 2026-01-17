@@ -47,12 +47,12 @@ public class SiteIndexingServise {
             //System.out.println("Step 2");
 
             for (searchengine.config.Site site : sitesList.getSites()) {
-//                System.out.println("Начало индексации сайта: " + site.getName());
-//                Site siteForDel = siteRepository.findByUrl(site.getUrl());
-//                if (siteForDel != null) {
-//                    System.out.println("Удаляем данные для " + site.getName());
-//                    siteRepository.delete(siteForDel);
-//                }
+                System.out.println("Начало индексации сайта: " + site.getName());
+                Site siteForDel = siteRepository.findByUrl(site.getUrl());
+                if (siteForDel != null) {
+                    System.out.println("Удаляем данные для " + site.getName());
+                    siteRepository.delete(siteForDel);
+                }
                 SiteProcessor siteProcessor = new SiteProcessor(siteRepository, pageRepository, lemmaRepository, indexRepository, sitesList, site.getUrl(), site.getName());
                 runningProcessors.add(siteProcessor);
 
