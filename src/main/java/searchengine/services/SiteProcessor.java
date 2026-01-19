@@ -2,16 +2,12 @@ package searchengine.services;
 
 import searchengine.config.SitesList;
 import searchengine.dto.model.SiteStatus;
-import searchengine.model.Page;
 import searchengine.model.Site;
 import searchengine.repositories.IndexRepository;
 import searchengine.repositories.LemmaRepository;
 import searchengine.repositories.PageRepository;
 import searchengine.repositories.SiteRepository;
-
 import java.sql.Timestamp;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 public class SiteProcessor extends Thread {
