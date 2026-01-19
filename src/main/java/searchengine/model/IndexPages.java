@@ -16,6 +16,16 @@ public class IndexPages {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    // Связь с Page
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "page_id", nullable = false, insertable = false, updatable = false)
+    private Page page;
+
+    // Связь с Lemma
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lemma_id", nullable = false, insertable = false, updatable = false)
+    private Lemma lemma;
+
     @Column(name="page_id")
     private int pageId;
 

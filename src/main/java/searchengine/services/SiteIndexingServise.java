@@ -32,7 +32,6 @@ public class SiteIndexingServise {
     private final List<SiteProcessor> runningProcessors = Collections.synchronizedList(new ArrayList<>());
 
     public IndexingResponse startIndexing() {
-        //StartIndexingResponse startIndexingResponse = new StartIndexingResponse();
 
         if (isIndexingRunning()) {
             return new IndexingResponse(false, "Индексация уже запущена");
@@ -48,6 +47,11 @@ public class SiteIndexingServise {
 
             for (searchengine.config.Site site : sitesList.getSites()) {
                 System.out.println("Начало индексации сайта: " + site.getName());
+                Site siteForDel = siteRepository.findByUrl(site.getUrl());
+                if (siteForDel != null) {
+                    System.out.println("Удаляем данные для " + site.getName());
+                    siteRepository.delete(siteForDel);
+                }
                 SiteProcessor siteProcessor = new SiteProcessor(siteRepository, pageRepository, lemmaRepository, indexRepository, sitesList, site.getUrl(), site.getName());
                 runningProcessors.add(siteProcessor);
 

@@ -8,8 +8,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.IndexPages;
 
+import java.util.List;
+
 @Repository
 public interface IndexRepository extends JpaRepository<IndexPages, Integer> {
+
+    IndexPages findByPageIdAndLemmaId(int pageId, int lemmaId);
+
+    List<IndexPages> findByPageId(int pageId);
 
     @Modifying
     @Transactional

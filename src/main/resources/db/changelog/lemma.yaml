@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-lemma.yaml
+  - changeSet:
+      id: create_lemma_table
+      author: Anastasia
+      changes:
+        - createTable:
+            tableName: lemma
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: site_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lemma_site
+                    referencedTableName: site
+                    referencedColumnNames: id
+                    onDelete: CASCADE
+              - column:
+                  name: lemma
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: frequency
+                  type: INT
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: lemma
+            indexName: idx_lemma_site
+            unique: true
+            columns:
+              - column:
+                  name: lemma
+              - column:
+                  name: site_id
+
+        - createIndex:
+            tableName: lemma
+            indexName: idx_lemma_site_id
+            columns:
+              - column:
+                  name: site_id
+
+        - createIndex:
+            tableName: lemma
+            indexName: idx_lemma_text
+            columns:
+              - column:
+                  name: lemma

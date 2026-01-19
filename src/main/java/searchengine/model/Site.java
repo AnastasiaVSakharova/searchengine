@@ -8,6 +8,7 @@ import searchengine.dto.model.SiteStatus;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,11 +38,23 @@ public class Site {
     @Column(name="name", columnDefinition = "VARCHAR(255)", nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "site_id")
-    private Set<Page> pageList;
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "site_id")
+//    private Set<Page> pageList;
+//
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinColumn(name = "site_id")
+//    private Set<Lemma> lemmaList;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
-    private Set<Lemma> lemmaList;
+    @OneToMany(mappedBy = "site",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private Set<Page> pageList = new HashSet<>();
+
+    @OneToMany(mappedBy = "site",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private Set<Lemma> lemmaList = new HashSet<>();
 }

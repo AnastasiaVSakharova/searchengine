@@ -6,24 +6,21 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
-import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.IndexingResponse;
 import searchengine.dto.InvalidUrlException;
 import searchengine.model.IndexPages;
-import searchengine.model.Lemma;
 import searchengine.model.Page;
 import searchengine.repositories.IndexRepository;
 import searchengine.repositories.LemmaRepository;
 import searchengine.repositories.PageRepository;
 import searchengine.repositories.SiteRepository;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+
 
 @Service
 @Slf4j
@@ -38,45 +35,64 @@ public class IndexPageServise {
 
     private static final int MAX_CONTENT_LENGTH = 500000; // ~500KB
 
-    public IndexingResponse indexPage(String url)  {
-        return indexPage(url, false);
+    public IndexingResponse indexPage(int pageId) {
+        // Проверяем, что страница еще не проиндексирована
+        List<IndexPages> indexPagesList = indexRepository.findByPageId(pageId);
+        if (indexPagesList.size() > 0) {
+            System.out.println("Страница уже проиндексирована");
+            return new IndexingResponse(true);
+        }
+        Page page = pageRepository.findById(pageId).orElse(null);
+        if (page == null) {
+            return new IndexingResponse(false, " IndexPageServise.indexPage На индексацию передана страница,"
+                    + " отсутствующая в pageRepository id = " + pageId);
+        }
+
+        try {
+            HashMap<String, Integer> lemmaFrequency = TextAnalyzerService.getLemmaFrequency(page.getContent());
+            saveLemmaInformation(lemmaFrequency, page.getSiteId(), pageId);
+        } catch (IOException e) {
+            String error = "Ошибка на этапе индексации страницы pageId = " + pageId +
+                    ". " + e.getMessage();
+            return new IndexingResponse(false, error);
+        }
+
+        return new IndexingResponse(true);
     }
 
-    public IndexingResponse indexPage(String url, boolean isIndexingOnePage)  {
+    public IndexingResponse indexPage(String url) {
 
         checkURLFormat(url);
-        // проверим URL, что входит в список индексируемых сайтов
         String rootUrl = "";
-
-        try {
-            rootUrl = checkBaseURL(url);
-        } catch (MalformedURLException e) {
-            String error = "Данная страница находится за пределами сайтов, " +
-                    "указанных в конфигурационном файле";
-            return new IndexingResponse(false, error);
-        }
-
-        if (rootUrl.isEmpty()) {
-            String error = "Данная страница находится за пределами сайтов, " +
-                    "указанных в конфигурационном файле";
-            return new IndexingResponse(false, error);
-        }
-
-        searchengine.model.Site site = new searchengine.model.Site();
-        site = siteRepository.findByUrl(rootUrl);;
-        int siteId = site.getId();
-
         String pagePath = "";
+        int siteId = 0;
+
         try {
+            rootUrl = extractRootUrl(url);
             pagePath = new URL(url).getPath();
+            pagePath = normalizePath(pagePath);
+
+            searchengine.model.Site site = siteRepository.findByUrl(rootUrl);
+            if (site == null) {
+                String error = "Данная страница находится за пределами сайтов, " +
+                        "указанных в конфигурационном файле";
+                return new IndexingResponse(false, error);
+            }
+
+            siteId = site.getId();
         } catch (MalformedURLException e) {
-            String error = "Внутренняя ошибка при обработке URL";
-            return new IndexingResponse(false, error);
+            throw new RuntimeException(e);
         }
-        pagePath = normalizePath(pagePath);
+
+
         Page page = (pageRepository.findByPathAndSiteId(pagePath, siteId) != null) ? pageRepository.findByPathAndSiteId(pagePath, siteId) : new Page();
 
         int pageId = (page != null) ? page.getId() : 0;
+
+        if (pageId != 0) {
+            deleteLemmaInfoPage(pageId, siteId);
+            return indexPage(pageId);
+        }
 
         try {
             // Получить html код
@@ -89,7 +105,6 @@ public class IndexPageServise {
             page.setCode(response.statusCode());
 
             Document doc = response.parse();
-            //String content = doc.html();
 
             if (response.statusCode() == 200) {
                 String content = doc.html();
@@ -98,21 +113,12 @@ public class IndexPageServise {
                 }
                 page.setContent(content);
 
-                if (isIndexingOnePage || pageId == 0) {
-
-                    if (pageId == 0) {
-                        page.setSiteId(siteId);
-                        page.setPath(pagePath);
-                        Page pageInsert = pageRepository.save(page);
-                        pageId = pageInsert.getId();
-                    } else {
-                        pageRepository.updateCodeAndContent(page.getCode(), page.getContent(), pageId);
-                    }
-
-                }
+                page.setSiteId(siteId);
+                page.setPath(pagePath);
+                Page pageInsert = pageRepository.save(page);
+                pageId = pageInsert.getId();
 
                 HashMap<String, Integer> lemmaFrequency = TextAnalyzerService.getLemmaFrequency(content);
-                deleteLemmaInfoPage(pageId, siteId);
                 saveLemmaInformation(lemmaFrequency, siteId, pageId);
 
             } else {
@@ -143,19 +149,6 @@ public class IndexPageServise {
         }
     }
 
-    private String checkBaseURL(String url) throws MalformedURLException {
-        String rootURL = extractRootUrl(url);
-        List<Site> sites = sitesList.getSites();
-
-        boolean found = false;
-        for (Site site : sites) {
-            if (extractRootUrl(site.getUrl()).equals(rootURL))
-                return rootURL;
-        }
-
-        return "";
-    }
-
     private static String extractRootUrl(String urlString) throws MalformedURLException {
         URL url = new URL(urlString);
         String scheme = url.getProtocol();
@@ -182,8 +175,8 @@ public class IndexPageServise {
     }
 
     private void saveLemmaInformation(HashMap<String, Integer> lemmaFrequency, int siteId, int pageId) {
-            for (String key : lemmaFrequency.keySet()) {
-                //int lemmaId = 0;
+        for (String key : lemmaFrequency.keySet()) {
+            try {
                 int frequency = lemmaFrequency.get(key);
                 lemmaRepository.upsertLemma(key, siteId);
                 int lemmaId = lemmaRepository.findIdByLemmaAndSiteId(key, siteId);
@@ -193,12 +186,19 @@ public class IndexPageServise {
                 indexPages.setPageId(pageId);
                 indexPages.setLemmaId(lemmaId);
                 indexPages.setMyRank((double) frequency);
+                IndexPages foundIndexPage = indexRepository.findByPageIdAndLemmaId(pageId, lemmaId);
+                if (foundIndexPage != null) {
+                    continue;
+                }
                 indexRepository.save(indexPages);
+            } catch (RuntimeException e) {
+                System.out.println("saveLemmaInformation. " + e.getMessage());
+                throw new RuntimeException(e);
             }
+        }
 
 
     }
-
 
 
     private void deleteLemmaInfoPage(int pageId, int siteId) {
@@ -206,4 +206,5 @@ public class IndexPageServise {
         indexRepository.deleteByPageId(pageId);
         lemmaRepository.decrementFrequencyForPageExists(siteId, pageId);
     }
+
 }

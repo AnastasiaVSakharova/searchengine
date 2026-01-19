@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-site.yaml
+  - changeSet:
+      id: create_site_table
+      author: Anastasia
+      changes:
+        - createTable:
+            tableName: site
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: ENUM('INDEXING', 'INDEXED', 'FAILED')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status_time
+                  type: DATETIME
+                  defaultValue: NOW()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_error
+                  type: TEXT
+              - column:
+                  name: url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
