@@ -40,10 +40,17 @@ public class IndexPageServise {
 
     private static final int MAX_CONTENT_LENGTH = 500000; // ~500KB
 
-    public IndexingResponse indexPage(int pageId)  {
+    public IndexingResponse indexPage(int pageId) {
+        // Проверяем, что страница еще не проиндексирована
+        List<IndexPages> indexPagesList = indexRepository.findByPageId(pageId);
+        if (indexPagesList.size() > 0) {
+            System.out.println("Страница уже проиндексирована");
+            return new IndexingResponse(true);
+        }
         Page page = pageRepository.findById(pageId).orElse(null);
         if (page == null) {
-            return new IndexingResponse(false, "Ошибка на этапе индексации страницы pageId = " + pageId);
+            return new IndexingResponse(false, " IndexPageServise.indexPage На индексацию передана страница,"
+                    + " отсутствующая в pageRepository id = " + pageId);
         }
 
         try {
@@ -58,10 +65,9 @@ public class IndexPageServise {
         return new IndexingResponse(true);
     }
 
-    public IndexingResponse indexPage(String url)  {
+    public IndexingResponse indexPage(String url) {
 
         checkURLFormat(url);
-
         String rootUrl = "";
         String pagePath = "";
         int siteId = 0;
@@ -174,8 +180,8 @@ public class IndexPageServise {
     }
 
     private void saveLemmaInformation(HashMap<String, Integer> lemmaFrequency, int siteId, int pageId) {
-            for (String key : lemmaFrequency.keySet()) {
-                //int lemmaId = 0;
+        for (String key : lemmaFrequency.keySet()) {
+            try {
                 int frequency = lemmaFrequency.get(key);
                 lemmaRepository.upsertLemma(key, siteId);
                 int lemmaId = lemmaRepository.findIdByLemmaAndSiteId(key, siteId);
@@ -185,8 +191,16 @@ public class IndexPageServise {
                 indexPages.setPageId(pageId);
                 indexPages.setLemmaId(lemmaId);
                 indexPages.setMyRank((double) frequency);
+                IndexPages foundIndexPage = indexRepository.findByPageIdAndLemmaId(pageId, lemmaId);
+                if (foundIndexPage != null) {
+                    continue;
+                }
                 indexRepository.save(indexPages);
+            } catch (RuntimeException e) {
+                System.out.println("saveLemmaInformation. " + e.getMessage());
+                throw new RuntimeException(e);
             }
+        }
 
 
     }

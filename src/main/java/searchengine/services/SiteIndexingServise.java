@@ -32,7 +32,6 @@ public class SiteIndexingServise {
     private final List<SiteProcessor> runningProcessors = Collections.synchronizedList(new ArrayList<>());
 
     public IndexingResponse startIndexing() {
-        //StartIndexingResponse startIndexingResponse = new StartIndexingResponse();
 
         if (isIndexingRunning()) {
             return new IndexingResponse(false, "Индексация уже запущена");
