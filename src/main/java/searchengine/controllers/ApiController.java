@@ -1,17 +1,11 @@
 package searchengine.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.IndexingResponse;
-import searchengine.dto.InvalidUrlException;
 import searchengine.dto.SearchResponse;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.*;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import java.io.IOException;
-import java.net.MalformedURLException;
 
 @RestController
 @RequiredArgsConstructor

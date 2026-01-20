@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
+import searchengine.dto.CustomTextException;
 import searchengine.dto.statistics.DetailedStatisticsItem;
 import searchengine.dto.statistics.StatisticsData;
 import searchengine.dto.statistics.StatisticsResponse;
@@ -39,20 +40,23 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Site> sitesList = sites.getSites();
         for(int i = 0; i < sitesList.size(); i++) {
             Site site = sitesList.get(i);
-            searchengine.model.Site siteEntity = siteRepository.findByUrl(site.getUrl());
-            DetailedStatisticsItem item = new DetailedStatisticsItem();
-            item.setName(site.getName());
-            item.setUrl(site.getUrl());
-            int pages = siteEntity.getPageList().size();
-            int lemmas = siteEntity.getLemmaList().size();
-            item.setPages(pages);
-            item.setLemmas(lemmas);
-            item.setStatus(siteEntity.getStatus().name());
-            item.setError(siteEntity.getLastError());
-            item.setStatusTime(siteEntity.getStatusTime().getTime());
-            total.setPages(total.getPages() + pages);
-            total.setLemmas(total.getLemmas() + lemmas);
-            detailed.add(item);
+                searchengine.model.Site siteEntity = siteRepository.findByUrl(site.getUrl());
+                if (siteEntity == null) {
+                    throw new CustomTextException("Запустите индексацию");
+                }
+                DetailedStatisticsItem item = new DetailedStatisticsItem();
+                item.setName(site.getName());
+                item.setUrl(site.getUrl());
+                int pages = siteEntity.getPageList().size();
+                int lemmas = siteEntity.getLemmaList().size();
+                item.setPages(pages);
+                item.setLemmas(lemmas);
+                item.setStatus(siteEntity.getStatus().name());
+                item.setError(siteEntity.getLastError());
+                item.setStatusTime(siteEntity.getStatusTime().getTime());
+                total.setPages(total.getPages() + pages);
+                total.setLemmas(total.getLemmas() + lemmas);
+                detailed.add(item);
         }
 
         StatisticsResponse response = new StatisticsResponse();

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.config.SitesList;
 import searchengine.dto.IndexingResponse;
-import searchengine.dto.InvalidUrlException;
+import searchengine.dto.CustomTextException;
 import searchengine.dto.model.SiteStatus;
 import searchengine.model.Page;
 import searchengine.model.Site;
@@ -157,7 +157,7 @@ public class PageParserService extends RecursiveAction {
                 page.setContent("Error: " + e.getMessage());
                 pageRepository.save(page);
             }
-        } catch (InvalidUrlException e) {
+        } catch (CustomTextException e) {
             throw new RuntimeException(e);
         } finally {
                 taskCounter.decrementAndGet();
