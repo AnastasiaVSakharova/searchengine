@@ -49,8 +49,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             searchengine.model.Site siteEntity = siteRepository.findByUrl(site.getUrl());
 
             if (siteEntity == null) {
-                item.setStatus("Индексация еще не запущена");
-                item.setError("");
+                item.setStatus("FAILED");
+                item.setError("Индексация еще не запущена");
                 item.setStatusTime(System.currentTimeMillis());
             } else {
                 item.setStatus(siteEntity.getStatus().name());
