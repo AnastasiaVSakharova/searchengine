@@ -48,7 +48,7 @@ public class SearchService {
             try {
                 dataSearchList.addAll(dataSearchListForSite(query, site));
             } catch (IOException e) {
-                log.error("Ошибка при поиске леммЖ " + e.getMessage(), e);
+                log.error("Ошибка при поиске лемм " + e.getMessage(), e);
             }
         }
 
@@ -195,13 +195,13 @@ public class SearchService {
 
         Element element = findFirstOccurrence(content, lemma);
         if (element != null) {
-            snippet = extractSnippetAroundWord(element, lemma, 200);
+            snippet = extractSnippetAroundWord(element, lemma, 100);
         } else {
             String foundWord = TextAnalyzerService.searchWordByLemma(content, lemma);
             element = doc.selectFirst(":contains(" + foundWord + ")");
             element = findFirstOccurrence(content, foundWord);
             if (element != null) {
-                snippet = extractSnippetAroundWord(element, foundWord, 200);
+                snippet = extractSnippetAroundWord(element, foundWord, 100);
             }
         }
         return snippet;

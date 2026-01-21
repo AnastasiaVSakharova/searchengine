@@ -38,25 +38,33 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         List<DetailedStatisticsItem> detailed = new ArrayList<>();
         List<Site> sitesList = sites.getSites();
-        for(int i = 0; i < sitesList.size(); i++) {
+        for (int i = 0; i < sitesList.size(); i++) {
             Site site = sitesList.get(i);
-                searchengine.model.Site siteEntity = siteRepository.findByUrl(site.getUrl());
-                if (siteEntity == null) {
-                    throw new CustomTextException("Запустите индексацию");
-                }
-                DetailedStatisticsItem item = new DetailedStatisticsItem();
-                item.setName(site.getName());
-                item.setUrl(site.getUrl());
-                int pages = siteEntity.getPageList().size();
-                int lemmas = siteEntity.getLemmaList().size();
-                item.setPages(pages);
-                item.setLemmas(lemmas);
+            DetailedStatisticsItem item = new DetailedStatisticsItem();
+            item.setName(site.getName());
+            item.setUrl(site.getUrl());
+
+            int pages = 0;
+            int lemmas = 0;
+            searchengine.model.Site siteEntity = siteRepository.findByUrl(site.getUrl());
+
+            if (siteEntity == null) {
+                item.setStatus("Индексация еще не запущена");
+                item.setError("");
+                item.setStatusTime(System.currentTimeMillis());
+            } else {
                 item.setStatus(siteEntity.getStatus().name());
                 item.setError(siteEntity.getLastError());
                 item.setStatusTime(siteEntity.getStatusTime().getTime());
-                total.setPages(total.getPages() + pages);
-                total.setLemmas(total.getLemmas() + lemmas);
-                detailed.add(item);
+                pages = siteEntity.getPageList().size();
+                lemmas = siteEntity.getLemmaList().size();
+            }
+
+            item.setPages(pages);
+            item.setLemmas(lemmas);
+            total.setPages(total.getPages() + pages);
+            total.setLemmas(total.getLemmas() + lemmas);
+            detailed.add(item);
         }
 
         StatisticsResponse response = new StatisticsResponse();
