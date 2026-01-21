@@ -8,7 +8,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import searchengine.config.SitesList;
 import searchengine.dto.IndexingResponse;
-import searchengine.dto.InvalidUrlException;
+import searchengine.dto.CustomTextException;
 import searchengine.model.IndexPages;
 import searchengine.model.Page;
 import searchengine.repositories.IndexRepository;
@@ -135,17 +135,17 @@ public class IndexPageServise {
         return new IndexingResponse(true);
     }
 
-    private void checkURLFormat(String url) throws InvalidUrlException {
+    private void checkURLFormat(String url) throws CustomTextException {
         if (url == null || url.trim().isEmpty()) {
-            throw new InvalidUrlException("URL не может быть пустым");
+            throw new CustomTextException("URL не может быть пустым");
         }
 
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            throw new InvalidUrlException("URL должен начинаться с http:// или https://");
+            throw new CustomTextException("URL должен начинаться с http:// или https://");
         }
 
         if (url.length() > 2048) {
-            throw new InvalidUrlException("URL слишком длинный");
+            throw new CustomTextException("URL слишком длинный");
         }
     }
 
