@@ -112,9 +112,11 @@ public class SearchService {
         for (String queryLemma : queryLemmas) {
             Lemma lemma = lemmaRepository.findByLemmaAndSiteId(queryLemma, siteId);
             if (lemma != null) {
-                if ((double) lemma.getFrequency() / summPages < 0.5) {
-                    queryLemmasFrequency.add(lemma);
-                }
+
+                    if (summPages<50 || queryLemmas.size()==1 || ((double) lemma.getFrequency() / summPages < 0.5)) {
+                        queryLemmasFrequency.add(lemma);
+                    }
+
             }
         }
 
